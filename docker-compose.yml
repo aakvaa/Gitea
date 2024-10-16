@@ -1,0 +1,30 @@
+services:
+  nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - gitea_net
+
+  gitea:
+    image: gitea/gitea:1.22.3-rootless
+    restart: unless-stopped
+    volumes:
+      - ./data:/var/lib/gitea
+      - ./config:/etc/gitea
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - gitea_net
+    environment:
+      - GITEA__server__ROOT_URL=http://gitea:3000/
+    expose:
+      - "3000"
+
+networks:
+  gitea_net:
+    driver: bridge
